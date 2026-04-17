@@ -22,3 +22,5 @@ This project requires a `.env` file at the root of the project to securely store
 2. Open `.env` and fill in the missing `your_*_key` values with your actual Firebase and Google Maps credentials.
 
 **Note:** The `.env` file is ignored by Git to prevent exposing your secrets, but `.env.example` is tracked to help developers know what variables are needed.
+
+The file is able to be downloaded on andriod as .apk file `app-release.apk`

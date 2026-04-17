@@ -56,4 +56,8 @@ windows/flutter/generated_plugins.cmake
 
 # Firebase Configs
 google-services.json
-GoogleService-Info.plist
+GoogleService-Info.plist
+
+# Compiled Android binaries
+*.apk
+*.aab
