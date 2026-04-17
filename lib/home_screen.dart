@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xFF121212),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+          padding: const EdgeInsets.fromLTRB(40, 16, 40, 80),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -249,9 +249,9 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                   final reminder = _results[index];
                   return InkWell(
                     onTap: () {
+                      final nav = Navigator.of(context);
                       _dismiss();
-                      Navigator.push(
-                        context,
+                      nav.push(
                         MaterialPageRoute(
                           builder: (_) => ReminderDetailPage(
                             reminder: reminder,
