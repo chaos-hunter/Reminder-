@@ -56,6 +56,4 @@ windows/flutter/generated_plugins.cmake
 
 # Firebase Configs
 google-services.json
-GoogleService-Info.plist
-firebase_options.dart
-firebase.json
+GoogleService-Info.plist
