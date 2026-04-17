@@ -27,7 +27,19 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Google Maps API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAH-aSdUJsu-OSBTCkOGBSRd6ZKpDHiIvE&libraries=places"></script>
+  <script>
+    fetch('assets/.env')
+      .then(response => response.text())
+      .then(text => {
+        const match = text.match(/GOOGLE_MAPS_API_KEY=(.*)/);
+        if (match && match[1]) {
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${match[1].trim()}&libraries=places`;
+          document.head.appendChild(script);
+        }
+      })
+      .catch(e => console.warn('Could not load Google Maps API key from .env', e));
+  </script>
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>

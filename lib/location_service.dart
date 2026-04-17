@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import 'reminder_data.dart';
 import 'reminder.dart';
@@ -21,8 +23,23 @@ void onStart(ServiceInstance service) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Load initial reminders
-  await ReminderData.loadReminders();
+  // Await auth state hydration so ReminderData doesn't fetch zero reminders
+  try {
+    await FirebaseAuth.instance
+        .authStateChanges()
+        .firstWhere((user) => user != null)
+        .timeout(const Duration(seconds: 5));
+  } catch (_) {}
+  
+  // Must initialize notifications in the background memory!
+  await LocationService._initNotifications();
+
+  // Load initial reminders and keep background isolate synced perfectly via Stream
+  ReminderData.remindersRef().snapshots().listen((snapshot) {
+    ReminderData.reminders = snapshot.docs.map((doc) {
+      return Reminder.fromMap(doc.data(), doc.id);
+    }).toList();
+  });
 
   LocationService.startBackgroundChecking(service);
 }
@@ -38,6 +55,11 @@ class LocationService {
   static String _lastTrackedDay = '';
 
   static Future<void> init() async {
+    if (kIsWeb) {
+      // Background services and deep permission handlers are for mobile only.
+      // Web just acts as a dashboard, so we skip this mobile initialization.
+      return;
+    }
     await _initNotifications();
     await _requestPermissions();
     await _initializeService();
@@ -112,10 +134,16 @@ class LocationService {
   }
 
   static Future<void> _requestPermissions() async {
-    // Explicitly prompt the user to "Allow All The Time" via Settings
-    await Permission.locationWhenInUse.request();
-    await Permission.locationAlways.request();
-    await Permission.notification.request();
+    // 1. Group the standard popups so Android queues them properly.
+    await [
+      Permission.notification,
+      Permission.locationWhenInUse,
+    ].request();
+
+    // 2. Only after those are resolved, prompt for deep background access which redirects to Settings.
+    if (await Permission.locationWhenInUse.isGranted) {
+      await Permission.locationAlways.request();
+    }
 
     await _notifications
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()

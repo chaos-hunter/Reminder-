@@ -8,6 +8,18 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+import java.io.File
+
+var mapsApiKey = ""
+val envFile = rootProject.file("../.env")
+if (envFile.exists()) {
+    envFile.forEachLine {
+        if (it.startsWith("GOOGLE_MAPS_API_KEY=")) {
+            mapsApiKey = it.substringAfter("=").trim()
+        }
+    }
+}
+
 android {
     namespace = "com.example.reminder_app"
     compileSdk = flutter.compileSdkVersion
@@ -32,6 +44,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders += mapOf("mapsApiKey" to mapsApiKey)
     }
 
     buildTypes {
