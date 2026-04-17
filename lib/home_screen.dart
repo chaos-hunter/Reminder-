@@ -249,15 +249,18 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                   final reminder = _results[index];
                   return InkWell(
                     onTap: () {
-                      final nav = Navigator.of(context);
-                      _dismiss();
-                      nav.push(
+                      final parentContext = this.context;
+                      // Push first to ensure navigation initiates smoothly, then dismiss
+                      Navigator.push(
+                        parentContext,
                         MaterialPageRoute(
                           builder: (_) => ReminderDetailPage(
                             reminder: reminder,
                           ),
                         ),
-                      );
+                      ).then((_) {
+                        _dismiss();
+                      });
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -308,7 +311,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
             const SizedBox(width: 8),
             Expanded(
               child: TextField(
-                onTapOutside: (_) => _dismiss(),
+                onTapOutside: (_) => _focusNode.unfocus(),
                 controller: _controller,
                 focusNode: _focusNode,
                 style: const TextStyle(color: Colors.white),
