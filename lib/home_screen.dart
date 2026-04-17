@@ -8,7 +8,7 @@ import 'reminder.dart';
 import 'reminder_data.dart';
 import 'reminder_detail_page.dart';
 import 'journal_services.dart';
-
+import 'journal_page.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -85,12 +85,30 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Journal',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const JournalPage()),
+                  );
+                },
+                child: Container(
+                  color: Colors.transparent, // Ensures the entire row is clickable
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text(
+                        'Journal',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
